@@ -1,3 +1,9 @@
+## 0.0.4
+
+* Fixed iOS iTunes URL encoding issue (double-encoded `&` in query params)
+* Fixed Android Play Store scraping — added User-Agent header and multiple regex fallbacks for current page structure
+* Used `Uri.https()` for proper URL construction on both platforms
+
 ## 0.0.3
 
 * Fixed iOS store URL using numeric `trackId` from iTunes API instead of bundle ID

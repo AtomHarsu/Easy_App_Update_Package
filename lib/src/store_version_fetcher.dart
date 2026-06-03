@@ -33,14 +33,31 @@ class StoreVersionFetcher {
 
   /// Scrapes the Google Play Store page for the current version.
   static Future<StoreVersionResult?> _fetchPlayStoreVersion(String appId) async {
-    final uri = Uri.parse('https://play.google.com/store/apps/details?id=$appId&hl=en');
-    final response = await http.get(uri);
+    final uri = Uri.https('play.google.com', '/store/apps/details', {'id': appId, 'hl': 'en'});
+    final response = await http.get(uri, headers: {
+      'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    });
     if (response.statusCode != 200) return null;
 
-    final matches = RegExp(r'\]\]\],"(\d+\.\d+\.[\d.]+)"').allMatches(response.body);
-    if (matches.isEmpty) return null;
+    // Try multiple patterns as Google changes the page structure
+    final patterns = [
+      RegExp(r'\[\[\["(\d+\.\d+\.?[\d.]*)"\]\]'),
+      RegExp(r'"(\d+\.\d+\.?[\d.]*)"\]\],null,null,null,null,null,null,null,null,\['),
+      RegExp(r'\]\]\],"(\d+\.\d+\.?[\d.]*)"'),
+      RegExp(r'Current Version.*?>(\d+\.\d+\.?[\d.]*)<'),
+    ];
 
-    final versions = matches.map((m) => m.group(1)!).toList();
+    final versions = <String>[];
+    for (final pattern in patterns) {
+      final matches = pattern.allMatches(response.body);
+      for (final m in matches) {
+        final v = m.group(1);
+        if (v != null) versions.add(v);
+      }
+      if (versions.isNotEmpty) break;
+    }
+
+    if (versions.isEmpty) return null;
     versions.sort(_compareVersions);
     return StoreVersionResult(version: versions.last);
   }
@@ -60,7 +77,7 @@ class StoreVersionFetcher {
   /// Uses the iTunes Lookup API to get the current App Store version and trackId.
   /// Throws on network/parse errors.
   static Future<StoreVersionResult?> _fetchAppStoreVersion(String appId, String country) async {
-    final uri = Uri.parse('https://itunes.apple.com/lookup?bundleId=$appId&country=$country');
+    final uri = Uri.https('itunes.apple.com', '/lookup', {'bundleId': appId, 'country': country});
     final response = await http.get(uri);
     if (response.statusCode != 200) {
       throw HttpException('iTunes lookup failed with status ${response.statusCode}');
