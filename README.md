@@ -1,4 +1,4 @@
-# Cross In-App Update
+# Easy App Update
 
 A lightweight Flutter package that notifies users when a new app version is available on the **Google Play Store** or **Apple App Store** — from a single codebase.
 
@@ -17,7 +17,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  cross_in_app_update: ^0.0.1
+  easy_app_update: ^0.0.1
 ```
 
 Ensure your Android app has internet permission in `AndroidManifest.xml`:
@@ -31,16 +31,16 @@ Ensure your Android app has internet permission in `AndroidManifest.xml`:
 ### Basic (soft update)
 
 ```dart
-import 'package:cross_in_app_update/cross_in_app_update.dart';
+import 'package:easy_app_update/easy_app_update.dart';
 
 // Call after your app's main widget has built
-CrossInAppUpdate.checkForUpdate(context);
+EasyAppUpdate.checkForUpdate(context);
 ```
 
 ### Force update
 
 ```dart
-CrossInAppUpdate.checkForUpdate(
+EasyAppUpdate.checkForUpdate(
   context,
   config: UpdateConfig(updateMode: UpdateMode.force),
 );
@@ -49,7 +49,7 @@ CrossInAppUpdate.checkForUpdate(
 ### Custom dialog
 
 ```dart
-CrossInAppUpdate.checkForUpdate(
+EasyAppUpdate.checkForUpdate(
   context,
   config: UpdateConfig(
     dialogBuilder: (context, storeVersion, openStore, dismiss) {
@@ -68,7 +68,7 @@ CrossInAppUpdate.checkForUpdate(
 ### Override app ID
 
 ```dart
-CrossInAppUpdate.checkForUpdate(
+EasyAppUpdate.checkForUpdate(
   context,
   config: UpdateConfig(appId: 'com.example.myapp'),
 );
@@ -88,4 +88,3 @@ The fetched store version is compared against the installed version. If a newer 
 - Requires internet access on the user's device
 - For iOS, the `country` parameter defaults to `"us"`. Set it to match your primary App Store region.
 - Play Store scraping may need updates if Google changes their page structure — contributions welcome!
-# Cross_In_App_Update_Package

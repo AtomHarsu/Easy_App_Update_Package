@@ -10,8 +10,8 @@ import 'update_dialog.dart';
 import 'version_comparator.dart';
 
 /// Main class to check for updates and show the update prompt.
-class CrossInAppUpdate {
-  const CrossInAppUpdate._();
+class EasyAppUpdate {
+  const EasyAppUpdate._();
 
   /// Checks for an update and shows a dialog if one is available.
   /// Returns `true` if an update was detected, `false` otherwise.

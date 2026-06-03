@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cross_in_app_update/cross_in_app_update.dart';
+import 'package:easy_app_update/easy_app_update.dart';
 
 void main() => runApp(const MyApp());
 
@@ -25,16 +25,16 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Basic usage — soft update dialog
-      CrossInAppUpdate.checkForUpdate(context);
+      EasyAppUpdate.checkForUpdate(context);
 
       // Force update example:
-      // CrossInAppUpdate.checkForUpdate(
+      // EasyAppUpdate.checkForUpdate(
       //   context,
       //   config: UpdateConfig(updateMode: UpdateMode.force),
       // );
 
       // Custom dialog example:
-      // CrossInAppUpdate.checkForUpdate(
+      // EasyAppUpdate.checkForUpdate(
       //   context,
       //   config: UpdateConfig(
       //     dialogBuilder: (context, version, openStore, dismiss) {
@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cross In-App Update Example')),
+      appBar: AppBar(title: const Text('Easy App Update Example')),
       body: const Center(child: Text('Check for updates on launch')),
     );
   }
