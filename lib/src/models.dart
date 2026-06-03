@@ -9,6 +9,10 @@ class UpdateConfig {
   /// If null, it will be auto-detected via package_info_plus.
   final String? appId;
 
+  /// Numeric App Store ID for iOS (e.g. "6758769110").
+  /// If null, it will be fetched from the iTunes Lookup API.
+  final String? iosStoreId;
+
   /// The country code for the App Store lookup (default: "us").
   final String country;
 
@@ -21,6 +25,7 @@ class UpdateConfig {
 
   const UpdateConfig({
     this.appId,
+    this.iosStoreId,
     this.country = 'us',
     this.updateMode = UpdateMode.soft,
     this.dialogBuilder,

@@ -1,6 +1,6 @@
 name: easy_app_update
 description: "Notify users when a new app version is available on Play Store or App Store. Supports force and soft update modes."
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/AtomHarsu/Cross_In_App_Update_Package
 repository: https://github.com/AtomHarsu/Cross_In_App_Update_Package
 issue_tracker: https://github.com/AtomHarsu/Cross_In_App_Update_Package/issues

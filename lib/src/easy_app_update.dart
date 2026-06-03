@@ -15,6 +15,7 @@ class EasyAppUpdate {
 
   /// Checks for an update and shows a dialog if one is available.
   /// Returns `true` if an update was detected, `false` otherwise.
+  /// Throws on network errors so the caller can handle failures.
   static Future<bool> checkForUpdate(
     BuildContext context, {
     UpdateConfig config = const UpdateConfig(),
@@ -23,34 +24,38 @@ class EasyAppUpdate {
     final appId = config.appId ?? packageInfo.packageName;
     final currentVersion = packageInfo.version;
 
-    final storeVersion = await StoreVersionFetcher.fetchStoreVersion(
+    final result = await StoreVersionFetcher.fetchStoreVersion(
       appId: appId,
       country: config.country,
     );
 
-    if (storeVersion == null) return false;
-    if (!VersionComparator.isUpdateAvailable(storeVersion, currentVersion)) return false;
+    if (result == null) return false;
+    if (!VersionComparator.isUpdateAvailable(result.version, currentVersion)) return false;
 
     if (!context.mounted) return false;
 
+    final storeUrl = _buildStoreUrl(appId, config.iosStoreId ?? result.trackId);
+
     await showUpdateDialog(
       context: context,
-      storeVersion: storeVersion,
+      storeVersion: result.version,
       updateMode: config.updateMode,
-      openStore: () => _openStoreListing(appId),
+      openStore: () => launchUrl(Uri.parse(storeUrl), mode: LaunchMode.externalApplication),
       dialogBuilder: config.dialogBuilder,
     );
 
     return true;
   }
 
-  static Future<void> _openStoreListing(String appId) async {
-    final Uri url;
+  static String _buildStoreUrl(String appId, String? iosTrackId) {
     if (Platform.isAndroid) {
-      url = Uri.parse('https://play.google.com/store/apps/details?id=$appId');
-    } else {
-      url = Uri.parse('https://apps.apple.com/app/id$appId');
+      return 'https://play.google.com/store/apps/details?id=$appId';
     }
-    await launchUrl(url, mode: LaunchMode.externalApplication);
+    // iOS: use numeric trackId for correct URL
+    if (iosTrackId != null) {
+      return 'https://apps.apple.com/app/id$iosTrackId';
+    }
+    // Fallback (shouldn't happen if iTunes API returned results)
+    return 'https://apps.apple.com/app/id$appId';
   }
 }

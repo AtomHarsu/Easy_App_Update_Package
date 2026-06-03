@@ -1,3 +1,9 @@
+## 0.0.3
+
+* Fixed iOS store URL using numeric `trackId` from iTunes API instead of bundle ID
+* Added `iosStoreId` parameter to `UpdateConfig` for manual override
+* Network errors now propagate instead of silently returning null
+
 ## 0.0.2
 
 * Lowered Dart SDK constraint to `>=3.0.0 <4.0.0` for broader Flutter compatibility

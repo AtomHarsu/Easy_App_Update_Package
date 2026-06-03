@@ -3,12 +3,23 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+/// Result from the store version fetch.
+class StoreVersionResult {
+  final String version;
+
+  /// Numeric App Store track ID (iOS only). Null on Android.
+  final String? trackId;
+
+  const StoreVersionResult({required this.version, this.trackId});
+}
+
 /// Fetches the latest app version from the Play Store or App Store.
 class StoreVersionFetcher {
   const StoreVersionFetcher._();
 
   /// Fetches latest version from the appropriate store based on platform.
-  static Future<String?> fetchStoreVersion({
+  /// Throws on network/parse errors so callers can handle failures.
+  static Future<StoreVersionResult?> fetchStoreVersion({
     required String appId,
     String country = 'us',
   }) async {
@@ -21,23 +32,17 @@ class StoreVersionFetcher {
   }
 
   /// Scrapes the Google Play Store page for the current version.
-  static Future<String?> _fetchPlayStoreVersion(String appId) async {
-    try {
-      final uri = Uri.parse('https://play.google.com/store/apps/details?id=$appId&hl=en');
-      final response = await http.get(uri);
-      if (response.statusCode != 200) return null;
+  static Future<StoreVersionResult?> _fetchPlayStoreVersion(String appId) async {
+    final uri = Uri.parse('https://play.google.com/store/apps/details?id=$appId&hl=en');
+    final response = await http.get(uri);
+    if (response.statusCode != 200) return null;
 
-      // Version appears in pattern: ]]],"x.x.x",null
-      final matches = RegExp(r'\]\]\],"(\d+\.\d+\.\d+[\d.]*)"').allMatches(response.body);
-      if (matches.isEmpty) return null;
+    final matches = RegExp(r'\]\]\],"(\d+\.\d+\.[\d.]+)"').allMatches(response.body);
+    if (matches.isEmpty) return null;
 
-      // Return the highest version found.
-      final versions = matches.map((m) => m.group(1)!).toList();
-      versions.sort(_compareVersions);
-      return versions.last;
-    } catch (_) {
-      return null;
-    }
+    final versions = matches.map((m) => m.group(1)!).toList();
+    versions.sort(_compareVersions);
+    return StoreVersionResult(version: versions.last);
   }
 
   static int _compareVersions(String a, String b) {
@@ -52,19 +57,24 @@ class StoreVersionFetcher {
     return 0;
   }
 
-  /// Uses the iTunes Lookup API to get the current App Store version.
-  static Future<String?> _fetchAppStoreVersion(String appId, String country) async {
-    try {
-      final uri = Uri.parse('https://itunes.apple.com/lookup?bundleId=$appId&country=$country');
-      final response = await http.get(uri);
-      if (response.statusCode != 200) return null;
-
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final results = json['results'] as List;
-      if (results.isEmpty) return null;
-      return results.first['version'] as String?;
-    } catch (_) {
-      return null;
+  /// Uses the iTunes Lookup API to get the current App Store version and trackId.
+  /// Throws on network/parse errors.
+  static Future<StoreVersionResult?> _fetchAppStoreVersion(String appId, String country) async {
+    final uri = Uri.parse('https://itunes.apple.com/lookup?bundleId=$appId&country=$country');
+    final response = await http.get(uri);
+    if (response.statusCode != 200) {
+      throw HttpException('iTunes lookup failed with status ${response.statusCode}');
     }
+
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final results = json['results'] as List;
+    if (results.isEmpty) return null;
+
+    final first = results.first as Map<String, dynamic>;
+    final version = first['version'] as String?;
+    final trackId = first['trackId']?.toString();
+    if (version == null) return null;
+
+    return StoreVersionResult(version: version, trackId: trackId);
   }
 }
