@@ -1,9 +1,9 @@
 name: cross_in_app_update
 description: "A lightweight Flutter package that notifies users when a new app version is available on Google Play Store or Apple App Store. Supports force and soft update modes with customizable UI."
-version: 0.0.1
-homepage: https://github.com/anthropics/cross_in_app_update
-repository: https://github.com/anthropics/cross_in_app_update
-issue_tracker: https://github.com/anthropics/cross_in_app_update/issues
+version: 0.0.2
+homepage: https://github.com/AtomHarsu/Cross_In_App_Update_Package
+repository: https://github.com/AtomHarsu/Cross_In_App_Update_Package
+issue_tracker: https://github.com/AtomHarsu/Cross_In_App_Update_Package/issues
 
 topics:
   - update
