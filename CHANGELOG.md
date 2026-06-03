@@ -1,3 +1,7 @@
+## 0.0.2
+
+* Lowered Dart SDK constraint to `>=3.0.0 <4.0.0` for broader Flutter compatibility
+
 ## 0.0.1
 
 * Initial release
